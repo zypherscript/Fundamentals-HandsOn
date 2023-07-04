@@ -24,7 +24,7 @@
 
     kubectl exec mybox -it -- /bin/sh
 
-## Create a file
+## CREATE a file
 
     cd demo
     cat > hello.txt

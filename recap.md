@@ -80,3 +80,104 @@ kubectl exec -it [podName] -c [containername] --sh
 kubectl logs [podName] -c [containername]
 kubectl delete -f two-containers.yaml --force --grace-period=0
 ```
+
+Workloads: an application running on K8s
+
+- Pod
+- ReplicaSet: manage pod replicas, ensure the desired number of pods are running > Deployment (pod yml -> template)
+- Deployment: ReplicaSet=Self-healing+scalability <> Deployment=Rolling updates+rollbacks
+- DeamonSet: node-local facilities, such as storage driver or network plugin [all nodes]
+- StatefulSet(kind Service) ???
+- Tasks that run to completion: Job, CronJob(spec > schedule): workload for short lived tasks
+
+Updates[Deployment]:
+
+- replicas: number of pod instances
+- revisionHistoryLimit: number of previous iterations to keep
+- strategy(type): RollingUpdate(maxSurge, maxUnavailable :: def=25%), Recreate
+- **Blue-Green Deployments
+
+Services
+
+- ClusterIP: default, Cluster internal, port/targetPort, Load balanced using round robin
+- NodePort: extend the ClusterIP, internal/external(Node IP + nodePort), NodePort, port/targetPort
+- Loadbalancer: L4 && Ingress: L7: 
+
+Volume
+
+- Storage: Cloud storage provider < CSI < Persistent Volume/PVC, StorageClass
+- Storage > Static way: Persistent Volumes[available, bound, released, Failed] and Claims
+- Storage > Dynamic way: StorageClass!!
+
+ConfigMaps + Volumes: need to learn more tho
+
+Secrets: can mounting vol too, ?
+
+Observability: Startup, Readiness!, Liveness! probes:: [Readiness: stop accepting traffic/Liveness: restart the pod]
+
+Dashboards: K8s, Lens, ...
+
+Scaling Pods
+
+- Horizontal Pod AutoScaling: use K8s metrics server, pods must have requests and limits defined, scale according to min/max number of replicas, w/ cooldown/delay, HPA checking
+
+
+
+```
+kubectl get rs
+kubectl describe rs rs-example
+kubectl delete rs [rsName]
+kubectl create deploy [deploymentName] --image=busybox --relicas=3 --port=80
+kubectl get deploy
+kubectl describe deploy deploy-example
+kubectl get ds
+kubectl describe ds [dsName]
+kubectl delete ds [dsName]
+kubectl get sts
+kubectl describe sts [stsName]
+kubectl delete sts [stsName]
+kubectl create job [jobName] --image=busybox
+kubectl get job
+kubectl desscribe job [jobName]
+kubectl delete job [jobName]
+kubectl create cronjob [jobName] --image=busybox --schedule="*/1 * * * *" -- bin/sh -c "date;"
+kubectl get cj
+kubectl desscribe cj [jobName]
+kubectl delete cj [jobName]
+kubectl rollout status: get the progress of the update
+kubectl rollout history deployment [deploymentName]: get history of the deployment
+kubectl rollout undo [deploymentName]: rollback a deployment
+kubectl rollout undo [deploymentName] --to-revision=[revision#]
+
+kubectl expose po [podName] --port=80 --target-port=8080 --name=frontend: service to expose pod
+kubectl expose deploy [deployName] --port=80 --target-port=8080: service to expose deployment
+kubectl get svc
+kubectl describe svc [serviceName]
+kubectl delete svc [serviceName]
+kubectl expose po [podName] --port=80 --target-port=8080 --type=NodePort
+kubectl expose deploy [deployName] --port=80 --target-port=8080 --type=NodePort
+
+kubectl get pv
+kubectl get pvc
+kubectl describe pv [pvName]
+kubectl describe pvc [pvcName]
+kubectl delete pv [pvName]
+kubectl delete pvc [pvcName]
+kubectl get sc
+kubectl describe sc [pvName]
+kubectl delete sc [pvName]
+
+kubectl create cm [name] --from-file=myconfig.txt
+kubectl create cm [name] --from-file=config/ : folder
+kubectl get cm
+kubectl get cm [name] -o YAML : save a ConfigMap in a YAML file
+
+kubectl get secrets
+kubectl get secrets [secretName] -o YAML
+kubectl delete secrets [secretName]
+
+kubectl autoscale deployment [name] --cpu-percent=50 --min=3 --max=10
+kubectl get hpa [name]
+kubectl delete hpa [name]
+
+```
